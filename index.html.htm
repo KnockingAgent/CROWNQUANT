@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WalletConnect Integration</title>
+  <script type="module">
+    import Web3 from "https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js";
+    import WalletConnectProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js";
+    import Web3Modal from "https://cdn.jsdelivr.net/npm/web3modal@1.9.5/dist/index.js";
+
+    let web3Modal;
+    let provider;
+    let web3;
+    let selectedAccount;
+
+    // Setup Web3Modal
+    function init() {
+      const providerOptions = {
+        walletconnect: {
+          package: WalletConnectProvider,
+          options: {
+            rpc: {
+              1: "https://mainnet.infura.io/v3/dd9611ef2b8a4d02b509b101f55c9d8d",  // Replace with your actual Infura Project ID
+              137: "https://polygon-rpc.com" // Optional: Add other networks like Polygon
+            },
+          },
+        },
+      };
+
+      web3Modal = new Web3Modal.default({
+        cacheProvider: false,
+        providerOptions,
+      });
+    }
+
+    // Connect wallet
+    async function connectWallet() {
+      try {
+        provider = await web3Modal.connect();
+        web3 = new Web3(provider);
+
+        const accounts = await web3.eth.getAccounts();
+        selectedAccount = accounts[0];
+        document.getElementById("walletAddress").innerText = "Connected: " + selectedAccount;
+      } catch (e) {
+        console.error("Could not connect wallet:", e);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      init();
+      document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
+    });
+  </script>
+</head>
+<body style="font-family: Arial, sans-serif; text-align: center; margin-top: 100px;">
+  <h1>Connect Wallet via WalletConnect</h1>
+  <button id="connectWalletBtn" style="padding: 10px 20px; font-size: 16px;">Connect Wallet</button>
+  <p id="walletAddress" style="margin-top: 20px; font-size: 18px;"></p>
+</body>
+</html>
